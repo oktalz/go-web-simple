@@ -5,6 +5,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"sync/atomic"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
@@ -12,10 +13,17 @@ import (
 )
 
 type Stats struct {
-	Group     string `json:"group"`
-	ID        string `json:"id"`
-	Timestamp int64  `json:"timestamp"`
-	URL       string `json:"url"`
+	Group         string `json:"group"`
+	ID            string `json:"id"`
+	Timestamp     int64  `json:"timestamp"`
+	URL           string `json:"url"`
+	RequestsCount int64  `json:"requests-num"`
+}
+
+var requestsCount int64 = 0
+
+func requestsCountInc() int64 {
+	return atomic.AddInt64(&requestsCount, 1)
 }
 
 func main() {
@@ -29,19 +37,27 @@ func main() {
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 	http.HandleFunc("/id", func(w http.ResponseWriter, r *http.Request) {
+		requestsCountInc()
 		fmt.Fprintf(w, "%s\n", ulid)
 	})
 
 	http.HandleFunc("/gid", func(w http.ResponseWriter, r *http.Request) {
+		requestsCountInc()
 		fmt.Fprintf(w, "%s-%s\n", group, ulid)
 	})
 
+	http.HandleFunc("/gidc", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s-%s-%d\n", group, ulid, requestsCountInc())
+	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		counter := requestsCountInc()
 		stat := Stats{
-			Group:     group,
-			ID:        ulid,
-			Timestamp: time.Now().UnixNano(),
-			URL:       r.URL.Path,
+			Group:         group,
+			ID:            ulid,
+			Timestamp:     time.Now().UnixNano(),
+			URL:           r.URL.Path,
+			RequestsCount: counter,
 		}
 
 		js, err := json.Marshal(stat)
