@@ -32,6 +32,10 @@ func main() {
 		fmt.Fprintf(w, "%s\n", ulid)
 	})
 
+	http.HandleFunc("/gid", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s-%s\n", group, ulid)
+	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		stat := Stats{
 			Group:     group,
