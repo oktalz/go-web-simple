@@ -30,6 +30,7 @@ func main() {
 	t := time.Now()
 	entropy := rand.New(rand.NewSource(t.UnixNano()))
 	ulid := ulid.MustNew(ulid.Timestamp(t), entropy).String()
+	ulidShort := ulid[len(ulid)-3:]
 	fmt.Println(ulid)
 
 	group := os.Getenv("GROUP")
@@ -48,6 +49,10 @@ func main() {
 
 	http.HandleFunc("/gidc", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s-%s-%d\n", group, ulid, requestsCountInc())
+	})
+
+	http.HandleFunc("/gids", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s-%s-%d\n", group, ulidShort, requestsCountInc())
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
