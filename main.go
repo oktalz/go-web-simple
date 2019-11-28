@@ -34,6 +34,10 @@ func main() {
 	fmt.Println(ulid)
 
 	group := os.Getenv("GROUP")
+	nodeName := os.Getenv("NODE_NAME")
+	podName := os.Getenv("POD_NAME")
+	podNamespace := os.Getenv("POD_NAMESPACE")
+	podIP := os.Getenv("POD_IP")
 
 	var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
@@ -53,6 +57,14 @@ func main() {
 
 	http.HandleFunc("/gids", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s-%s-%d\n", group, ulidShort, requestsCountInc())
+	})
+
+	http.HandleFunc("/info", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s-%s-%s [%d]\n", nodeName, podNamespace, podName, requestsCountInc())
+	})
+
+	http.HandleFunc("/ip", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s [%d]\n", podIP, requestsCountInc())
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
