@@ -64,7 +64,7 @@ func main() {
 	})
 
 	http.HandleFunc("/ip", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "%-10v [%d]\n", podIP, requestsCountInc())
+		fmt.Fprintf(w, "%-15v [%d]\n", podIP, requestsCountInc())
 	})
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
