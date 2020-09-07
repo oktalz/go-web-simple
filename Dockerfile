@@ -1,5 +1,5 @@
 #builder
-FROM golang:1.13.1-alpine AS builder
+FROM golang:1.15.1-alpine AS builder
 
 COPY / /src
 RUN cd /src && CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o web_server 
